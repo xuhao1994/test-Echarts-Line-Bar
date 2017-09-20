@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+   <style>
+        #pic1,#pic2{
+		    width: 100%;
+		    height: 502px;
+		    margin-top: 75px;
+        }
+        *{
+        	margin: 0;
+        	padding: 0;
+        }
+        .clearfix::after {
+		    visibility: hidden;
+		    clear: both;
+		    display: block;
+		    height: 0;
+		    font-size: 0;
+		    content: " ";
+		}
+		.fl{
+			float: left;
+		}
+		.fr{
+			float: right;
+		}
+		h3{
+			height: 54px;
+		    box-sizing: border-box;
+		    line-height: 54px;
+		    padding-left: 10px;
+		    border-bottom: 3px solid #019eeb;
+		    font-size: 16px;
+		    font-weight: 400;
+		    margin-bottom: 18px;
+		}
+		.tongjiLineBox {
+			position: relative;
+		    height: 579px;
+		    box-sizing: border-box;
+		    border: 1px solid #d2d2d2;
+		    overflow: hidden;
+		    margin-bottom: 18px;
+		}
+		.controlLine{
+			width: 416px;
+			height: 34px;
+			box-sizing: border-box;
+			position: absolute;
+			border: 1px solid #d2d2d2;
+			right: 20px;
+			top: 38px;
+			border-radius: 4px;
+			line-height: 34px;
+			color: #555;
+			overflow: hidden;
+		}
+		.controlLine>span {
+		    float: left;
+		    height: 100%;
+		    width: 59px;
+		    box-sizing: border-box;
+		    text-align: center;
+		    font-size: 14px;
+		    line-height: 32px;
+		    background-color: #f5f5f5;
+		    cursor: pointer;
+		}
+		.controlLine>span:not(:last-child){
+			border-right: 1px solid #d2d2d2;
+		}
+		span.curFilter{
+			color: #019eeb;
+			background-color: #fff;
+		}
+		.LineBoxTitle {
+		    position: absolute;
+		    font-size: 16px;
+		    top: 38px;
+		    left: 20px;
+		}
+    </style>
+</head>
+<body>
+	<div id="rightBox" class="float-right publicHidden">
+		<section>
+			<h3 class="publicBorderB_3red FontSize16 FontSizeB publicPadding10 publicMarginBot15 ">交易统计</h3>
+			<div class="tongjiLineBox">
+				<div id="pic1" class="fl"></div>
+				<div class="controlLine" type="line">
+					<span type="1" class="curFilter">近7日</span>
+					<span type="2">近30日</span>
+					<span type="3">本月</span>
+					<span type="4">上月</span>
+					<span type="5">近半年</span>
+					<span type="6">近一年</span>
+					<span type="7">至今</span>
+				</div>
+				<div class="LineBoxTitle">
+					机构交易情况
+				</div>
+			</div>
+
+			<div class="tongjiLineBox">
+				<div id="pic2" class="fl"></div>
+				<div class="controlLine" type="bar">
+					<span type="1" class="curFilter">近7日</span>
+					<span type="2">近30日</span>
+					<span type="3">本月</span>
+					<span type="4">上月</span>
+					<span type="5">近半年</span>
+					<span type="6">近一年</span>
+					<span type="7">至今</span>
+				</div>
+				<div class="LineBoxTitle">
+					机构交易情况
+				</div>
+			</div>
+		</section>
+	</div>
+	<script src="jquery.min.js"></script>
+	<script src="echarts.js"></script>
+	<script>
+	var myCharts1;
+	var myCharts2;
+	var mydata = [
+	   				{
+	   					name:"1997/10/4",
+	   					value:[
+	   						"1997/10/4",
+	   						720
+	   					]
+	   				},
+	   				{
+	   					name:"1997/10/5",
+	   					value:[
+	   						"1997/10/5",
+	   						1400
+	   					]
+	   				},
+	   				{
+	   					name:"1997/10/6",
+	   					value:[
+	   						"1997/10/6",
+	   						200
+	   					]
+	   				},
+	   				{
+	   					name:"1997/10/7",
+	   					value:[
+	   						"1997/10/7",
+	   						2100
+	   					]
+	   				}
+	   			];
+	var mydata2 = [
+   				{
+   					name:"1997/10/4",
+   					value:[
+   						"1997/10/4",
+   						150
+   					]
+   				},
+   				{
+   					name:"1997/10/5",
+   					value:[
+   						"1997/10/5",
+   						400
+   					]
+   				},
+   				{
+   					name:"1997/10/6",
+   					value:[
+   						"1997/10/6",
+   						1220
+   					]
+   				},
+   				{
+   					name:"1997/10/7",
+   					value:[
+   						"1997/10/7",
+   						100
+   					]
+   				}
+   			];
+	var mydata3 = ['300','500','2000','1400','1600','1800'];
+	var mydata4 = ['2000','1400','1000','1200','500','1800'];
+$(function(){
+	createLineTable(mydata,"pic1");
+	createBarTable(mydata3,"pic2");
+	$(".controlLine span").on("click",filterTable);
+});
+//更新数据函数
+function updateLine(curdata){
+	myCharts1.setOption({
+        series: [{
+            data: curdata
+        }]
+    });
+}
+function updateBar(curdata){
+	myCharts2.setOption({
+        series: [{
+            data: curdata
+        }]
+    });
+}
+
+
+//控制图表筛选操作
+
+function filterTable(){
+	$(this).siblings().removeClass('curFilter');
+	$(this).addClass('curFilter');
+
+	if($(this).parent().attr("type") == "line"){
+		var type = $(this).attr("type");
+		if(type == "2"){
+			updateLine(mydata2);
+		}else{
+			updateLine(mydata);
+		}
+	}else{
+		var type = $(this).attr("type");
+		if(type == "2"){
+			updateBar(mydata4);
+		}else{
+			updateBar(mydata3);
+		}
+	}
+
+	
+}
+
+//生成折线图
+function createLineTable(curdata,boxStr){
+		myCharts1 = echarts.init(document.getElementById(boxStr));
+     	var option1 = {
+	   		xAxis:{
+	   			type:'time',
+	   			name:'日期',
+	   			nameTextStyle:{
+	   				color:'#555555',
+	   				verticalAlign:'top',
+	   				padding:[0,0,20,0]
+	   			},
+	   			splitLine:{
+	   				show:true,
+	   				lineStyle:{
+	   					color:'#f5f5f5'
+	   				}
+	   			},
+	   			axisTick: {
+			        show: false
+			    },
+			    axisLine:{
+			    	lineStyle:{
+			    		color:"#d2d2d2"
+			    	}
+			    },
+			    axisLabel:{
+			    	formatter:function(item){
+			    		return (new Date(item)).toLocaleString()
+			    	}
+			    }
+	   		},
+	   		yAxis:{
+	   			type:'value',
+	   			name:'销售额',
+	   			nameTextStyle:{
+	   				color:'#555555',
+	   				align:'right',
+	   				padding:[0,0,0,40]
+	   			},
+	   			scale:false,
+	   			maxInterval:200,
+	   			max:2400,
+	   			axisLabel:{
+	   				formatter:function(index){
+	   					if(index!=0){
+	   						return index
+	   					}
+	   					return ""
+	   				}
+	   			},
+	   			splitLine:{
+	   				show:true,
+	   				lineStyle:{
+	   					color:'#f5f5f5'
+	   				}
+	   			},
+	   			axisTick: {
+			        show: false
+			    },
+			    axisLine:{
+			    	lineStyle:{
+			    		color:"#d2d2d2"
+			    	}
+			    }
+	   		},
+	   		tooltip:{
+	   			show:true,
+	   			trigger:"axis",
+	   			axisPointer: { type: 'none' } 
+	   		},
+	   		series:[{
+	   			type:'line',
+	   			name:'交易统计',
+	   			data: curdata
+	   		}],
+	   		textStyle:{
+	   			color:'#999999'
+	   		}
+	    };
+	    myCharts1.setOption(option1);
+}
+
+//生成柱状图
+function createBarTable(curdata,boxStr){
+		myCharts2 = echarts.init(document.getElementById(boxStr));
+     	var option1 = {
+	   		xAxis:{
+	   			type:'category',
+	   			name:'套餐',
+	   			nameTextStyle:{
+	   				color:'#555555',
+	   				verticalAlign:'top',
+	   				padding:[0,0,20,0]
+	   			},
+	   			boundaryGap:true,
+	   			splitLine:{
+	   				show:false,
+	   				lineStyle:{
+	   					color:'#f5f5f5'
+	   				}
+	   			},
+	   			axisTick: {
+			        show: false
+			    },
+			    axisLine:{
+			    	lineStyle:{
+			    		color:"#d2d2d2"
+			    	}
+			    },
+			    data:['入职体检','全身体检','婚前体检','优生优育','老年体检','儿童体检']
+	   		},
+	   		yAxis:{
+	   			type:'value',
+	   			name:'销售额',
+	   			nameTextStyle:{
+	   				color:'#555555',
+	   				align:'right',
+	   				padding:[0,0,0,40]
+	   			},
+	   			scale:false,
+	   			maxInterval:200,
+	   			max:2400,
+	   			axisLabel:{
+	   				formatter:function(index){
+	   					if(index!=0){
+	   						return index
+	   					}
+	   					return ""
+	   				}
+	   			},
+	   			splitLine:{
+	   				show:false,
+	   				lineStyle:{
+	   					color:'#f5f5f5'
+	   				}
+	   			},
+	   			axisTick: {
+			        show: false
+			    },
+			    axisLine:{
+			    	lineStyle:{
+			    		color:"#d2d2d2"
+			    	}
+			    }
+	   		},
+	   		tooltip:{
+	   			show:true,
+	   			trigger:"axis",
+	   			axisPointer: { type: 'none' }
+	   			//position:['85%','0']
+
+	   		},
+	   		series:[{
+	   			type:'bar',
+	   			name:'交易统计',
+	   			data: curdata,
+	   			itemStyle:{
+	   				normal:{
+	   					color:"#019eeb"
+	   				}
+	   			},
+	   			barWidth:"26px"
+	   		}],
+	   		textStyle:{
+	   			color:'#999999'
+	   		}
+	    };
+	    myCharts2.setOption(option1);
+}
+
+
+
+
+
+
+Date.prototype.toLocaleString = function() {
+	var year = this.getFullYear();
+	var month = this.getMonth() + 1;
+	var date = this.getDate();
+	if(Number(this.getMonth()+1)<10){
+		month = "0"+ month
+	}
+	if(Number(this.getDate())<10){
+		date = "0" + date
+	}
+    return year + "-" + month + "-" + date;
+};
+</script>
+</body>
+</html>
